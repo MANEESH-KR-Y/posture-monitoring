@@ -1,65 +1,427 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Posture Monitor</title>
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Posture Monitor</title>
+  <style>
+    :root {
+      --bg: #050509;
+      --bg-elevated: #0f0f17;
+      --bg-soft: #151521;
+      --border-subtle: #272737;
+      --accent: #3b82f6;
+      --accent-soft: rgba(59, 130, 246, 0.15);
+      --danger: #ef4444;
+      --warning: #facc15;
+      --good: #22c55e;
+      --text: #f9fafb;
+      --text-soft: #9ca3af;
+      --radius-lg: 16px;
+      --radius-md: 10px;
+      --shadow-soft: 0 18px 45px rgba(0, 0, 0, 0.65);
+      --transition-fast: 150ms ease-out;
+      --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+        "Segoe UI", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html,
+    body {
+      height: 100%;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      background: radial-gradient(circle at top, #111827 0, var(--bg) 45%, #020617 100%);
+      color: var(--text);
+      display: flex;
+      align-items: stretch;
+      justify-content: center;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1100px;
+      padding: 24px 16px 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* Header */
+
+    .header {
+      padding: 16px 18px 12px;
+      border-radius: var(--radius-lg);
+      background: linear-gradient(
+          135deg,
+          rgba(59, 130, 246, 0.18),
+          rgba(30, 64, 175, 0.12)
+        ),
+        radial-gradient(circle at top left, rgba(59, 130, 246, 0.2), transparent 55%);
+      border: 1px solid rgba(59, 130, 246, 0.45);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .header h1 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      margin-bottom: 4px;
+    }
+
+    .header p {
+      font-size: 0.9rem;
+      color: var(--text-soft);
+    }
+
+    /* Status panel */
+
+    .status-panel {
+      background: var(--bg-elevated);
+      border-radius: var(--radius-md);
+      padding: 12px 14px;
+      border: 1px solid var(--border-subtle);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.55);
+    }
+
+    .status-panel.good {
+      border-color: rgba(34, 197, 94, 0.6);
+    }
+
+    .status-panel.warning {
+      border-color: rgba(250, 204, 21, 0.7);
+    }
+
+    .status-panel.poor {
+      border-color: rgba(239, 68, 68, 0.7);
+    }
+
+    .status-header h3 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    #statusText {
+      color: var(--accent);
+    }
+
+    #statusDescription {
+      font-size: 0.85rem;
+      color: var(--text-soft);
+    }
+
+    /* Video area */
+
+    .video-area {
+      display: flex;
+      justify-content: center;
+    }
+
+    .video-container {
+      position: relative;
+      width: 100%;
+      max-width: 720px;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      background: #020617;
+      border: 1px solid var(--border-subtle);
+      box-shadow: var(--shadow-soft);
+    }
+
+    #webcam {
+      display: block;
+      width: 100%;
+      height: auto;
+      background: #000;
+      object-fit: cover;
+    }
+
+    .canvas-overlay {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    .video-badge {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      padding: 4px 10px;
+      font-size: 0.75rem;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--text-soft);
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      backdrop-filter: blur(10px);
+    }
+
+    /* Stats grid */
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    @media (max-width: 900px) {
+      .stats-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 600px) {
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .stat-card {
+      background: var(--bg-elevated);
+      border-radius: var(--radius-md);
+      padding: 10px 12px;
+      border: 1px solid var(--border-subtle);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .stat-card h4 {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-soft);
+    }
+
+    .score {
+      font-size: 1.7rem;
+      font-weight: 700;
+      margin-top: 4px;
+      color: var(--text);
+      text-shadow: 0 0 20px rgba(15, 23, 42, 0.9);
+    }
+
+    .score.good {
+      color: var(--good);
+    }
+
+    .score.warning {
+      color: var(--warning);
+    }
+
+    .score.poor {
+      color: var(--danger);
+    }
+
+    .stat-help {
+      font-size: 0.75rem;
+      color: var(--text-soft);
+    }
+
+    .indicator {
+      margin-top: 4px;
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      border: 1px solid var(--border-subtle);
+      color: var(--text-soft);
+      background: var(--bg-soft);
+    }
+
+    .indicator.good {
+      border-color: rgba(34, 197, 94, 0.7);
+      color: var(--good);
+      background: rgba(22, 163, 74, 0.12);
+    }
+
+    .indicator.poor {
+      border-color: rgba(239, 68, 68, 0.75);
+      color: var(--danger);
+      background: rgba(127, 29, 29, 0.28);
+    }
+
+    .indicator.warning {
+      border-color: rgba(250, 204, 21, 0.7);
+      color: var(--warning);
+      background: rgba(113, 63, 18, 0.3);
+    }
+
+    /* Controls */
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 2px;
+    }
+
+    .btn {
+      border-radius: 999px;
+      padding: 8px 16px;
+      font-size: 0.88rem;
+      border: 1px solid transparent;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: background var(--transition-fast), border-color var(--transition-fast),
+        transform var(--transition-fast), box-shadow var(--transition-fast),
+        color var(--transition-fast);
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #0b1020;
+      border-color: rgba(191, 219, 254, 0.9);
+      box-shadow: 0 12px 30px rgba(37, 99, 235, 0.55);
+    }
+
+    .btn-primary:hover {
+      background: #2563eb;
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: var(--bg-elevated);
+      border-color: var(--border-subtle);
+      color: var(--text-soft);
+    }
+
+    .btn-secondary:hover {
+      border-color: rgba(148, 163, 184, 0.7);
+      background: var(--bg-soft);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      border-color: rgba(55, 65, 81, 0.7);
+      color: var(--text-soft);
+    }
+
+    .btn-ghost:hover {
+      background: rgba(31, 41, 55, 0.7);
+      color: var(--text);
+    }
+
+    .btn-sm {
+      padding: 4px 10px;
+      font-size: 0.75rem;
+    }
+
+    /* Alert */
+
+    .alert {
+      display: none;
+      margin-top: 6px;
+      background: linear-gradient(
+        135deg,
+        rgba(239, 68, 68, 0.92),
+        rgba(190, 18, 60, 0.92)
+      );
+      border-radius: var(--radius-md);
+      padding: 8px 10px;
+      color: #fef2f2;
+      border: 1px solid rgba(254, 202, 202, 0.8);
+      box-shadow: 0 18px 40px rgba(127, 29, 29, 0.7);
+    }
+
+    .alert-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 0.85rem;
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>Posture Monitor</h1>
-            <p>Automatically monitors your sitting posture and alerts you when adjustments are needed</p>
-        </header>
+  <div class="container">
+    <header class="header">
+      <h1>AI Posture Monitor</h1>
+      <p>Real‑time sitting posture tracking with smart alerts and system notifications.</p>
+    </header>
 
-        <div class="status-panel" id="statusPanel">
-            <h3>Status: <span id="statusText">Initializing...</span></h3>
-            <p id="statusDescription">Starting posture monitoring system...</p>
-        </div>
+    <section class="status-panel" id="statusPanel">
+      <div class="status-header">
+        <h3>Status: <span id="statusText">Idle</span></h3>
+      </div>
+      <p id="statusDescription">Click “Start Monitoring” to begin calibration.</p>
+    </section>
 
-        <div class="video-container">
-            <video id="webcam" width="640" height="480" autoplay playsinline></video>
-            <canvas id="outputCanvas" class="canvas-overlay"></canvas>
-        </div>
+    <section class="video-area">
+      <div class="video-container">
+        <video id="webcam" width="640" height="480" autoplay playsinline></video>
+        <canvas id="outputCanvas" class="canvas-overlay"></canvas>
+        <div class="video-badge" id="videoBadge">Idle</div>
+      </div>
+    </section>
 
-        <div class="stats-grid">
-            <div class="stat-card">
-                <h4>Posture Score</h4>
-                <div class="score" id="postureScore">-</div>
-            </div>
-            <div class="stat-card">
-                <h4>Forward Head</h4>
-                <div class="indicator" id="forwardHeadIndicator">-</div>
-            </div>
-            <div class="stat-card">
-                <h4>Rounded Shoulders</h4>
-                <div class="indicator" id="shouldersIndicator">-</div>
-            </div>
-            <div class="stat-card">
-                <h4>Torso Alignment</h4>
-                <div class="indicator" id="torsoIndicator">-</div>
-            </div>
-        </div>
+    <section class="stats-grid">
+      <div class="stat-card">
+        <h4>Posture Score</h4>
+        <div class="score" id="postureScore">--</div>
+        <p class="stat-help">Target ≥ 80%</p>
+      </div>
+      <div class="stat-card">
+        <h4>Forward Head</h4>
+        <div class="indicator" id="forwardHeadIndicator">--</div>
+        <p class="stat-help">Head aligned over shoulders.</p>
+      </div>
+      <div class="stat-card">
+        <h4>Rounded Shoulders</h4>
+        <div class="indicator" id="shouldersIndicator">--</div>
+        <p class="stat-help">Keep chest open, shoulders back.</p>
+      </div>
+      <div class="stat-card">
+        <h4>Torso Alignment</h4>
+        <div class="indicator" id="torsoIndicator">--</div>
+        <p class="stat-help">Torso upright over hips.</p>
+      </div>
+    </section>
 
-        <div class="controls">
-            <button id="toggleMonitor" class="btn btn-primary">Start Monitoring</button>
-            <button id="resetStats" class="btn btn-secondary">Reset Statistics</button>
-        </div>
+    <section class="controls">
+      <button id="toggleMonitor" class="btn btn-primary">
+        ▶️ Start Monitoring
+      </button>
+      <button id="resetStats" class="btn btn-secondary">
+        Reset Calibration &amp; Stats
+      </button>
+      <button id="enableNotifications" class="btn btn-ghost">
+        🔔 Enable System Alerts
+      </button>
+    </section>
 
-        <div class="alert" id="alertBanner">
-            <div class="alert-content">
-                <span id="alertMessage"></span>
-                <button id="dismissAlert" class="btn btn-sm">Dismiss</button>
-            </div>
-        </div>
-    </div>
+    <section class="alert" id="alertBanner">
+      <div class="alert-content">
+        <span id="alertMessage">Posture alert goes here.</span>
+        <button id="dismissAlert" class="btn btn-sm btn-secondary">Dismiss</button>
+      </div>
+    </section>
+  </div>
 
-    <script src="/socket.io/socket.io.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-core"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-converter"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-webgl"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/pose-detection"></script>
-    <script src="app.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-core"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-converter"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-webgl"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/pose-detection"></script>
+  <script src="app.js"></script>
 </body>
 </html>
