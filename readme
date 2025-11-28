@@ -59,10 +59,7 @@ This design keeps inference on-device (privacy-first) and uses the backend only 
 * Express.js
 * Socket.IO (real-time events)
 
-**Optional**
 
-* Supabase (for storing session analytics)
-* Docker for containerized deployment
 
 ---
 
@@ -82,9 +79,7 @@ This design keeps inference on-device (privacy-first) and uses the backend only 
 
 ## Screenshots
 
-![Dashboard UI](./screenshots/ss1.png)
 
-![Real-Time Pose Detection / Alerts](./screenshots/ss2.png)
 
 > Screenshots are located in the `screenshots/` folder as `ss1.png` and `ss2.png`.
 
@@ -172,20 +167,4 @@ posture-monitor/
 
 ---
 
-## Contributing
 
-Contributions are welcome. Please open issues or submit pull requests. Keep changes small and document any new thresholds or model changes.
-
----
-
-## License
-
-This project is released under the **MIT License**. See `LICENSE` for details.
-
----
-
-## Contact
-
-Maintainer: Manee (or your name)
-
-Feel free to open issues on the repository for bugs, feature requests, or help with setup.
