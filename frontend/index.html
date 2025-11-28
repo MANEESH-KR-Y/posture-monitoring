@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Posture Monitor</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Posture Monitor</h1>
+            <p>Automatically monitors your sitting posture and alerts you when adjustments are needed</p>
+        </header>
+
+        <div class="status-panel" id="statusPanel">
+            <h3>Status: <span id="statusText">Initializing...</span></h3>
+            <p id="statusDescription">Starting posture monitoring system...</p>
+        </div>
+
+        <div class="video-container">
+            <video id="webcam" width="640" height="480" autoplay playsinline></video>
+            <canvas id="outputCanvas" class="canvas-overlay"></canvas>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h4>Posture Score</h4>
+                <div class="score" id="postureScore">-</div>
+            </div>
+            <div class="stat-card">
+                <h4>Forward Head</h4>
+                <div class="indicator" id="forwardHeadIndicator">-</div>
+            </div>
+            <div class="stat-card">
+                <h4>Rounded Shoulders</h4>
+                <div class="indicator" id="shouldersIndicator">-</div>
+            </div>
+            <div class="stat-card">
+                <h4>Torso Alignment</h4>
+                <div class="indicator" id="torsoIndicator">-</div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button id="toggleMonitor" class="btn btn-primary">Start Monitoring</button>
+            <button id="resetStats" class="btn btn-secondary">Reset Statistics</button>
+        </div>
+
+        <div class="alert" id="alertBanner">
+            <div class="alert-content">
+                <span id="alertMessage"></span>
+                <button id="dismissAlert" class="btn btn-sm">Dismiss</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-core"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-converter"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-webgl"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/pose-detection"></script>
+    <script src="app.js"></script>
+</body>
+</html>
