@@ -1,20 +1,136 @@
-# Posture Monitor Frontend
+# Posture Monitoring System
 
-This is the frontend for the Posture Monitoring System.
+A real-time, browser-based posture analysis tool powered by TensorFlow.js and a lightweight Node.js backend. Designed to promote ergonomic wellness and help users maintain proper posture during long desk sessions.
 
-## Features
-- Real-time webcam pose detection using MoveNet
-- Visual skeleton overlay
-- Real-time posture scoring and alerts
-- Responsive design for desktop and mobile
+---
 
-## Setup
-1. Ensure the backend server is running on port 3000
-2. Open `index.html` in a modern browser
-3. Allow camera permissions when prompted
-4. Click "Start Monitoring" to begin
+## 1. Overview
 
-## Requirements
-- Modern browser with camera access
-- Internet connection (for TensorFlow.js CDN)
-- Backend server running
+Modern work habits often involve long hours in front of screens, leading to slouched backs, forward head posture, and chronic discomfort. This project provides an on-device posture monitoring assistant that evaluates posture using the webcam and offers gentle alerts when alignment deteriorates.
+
+The system runs fully in the browser to ensure privacy, while the backend manages event signaling and alert logic.
+
+---
+
+## 2. Problem Statement
+
+Extended periods of poor posture can cause:
+
+- Neck and back pain
+- Reduced productivity
+- Muscular imbalance
+- Long-term spinal issues
+
+Users often fail to correct posture consistently without external feedback. A continuous, real-time, non-intrusive monitoring tool can significantly improve posture awareness and reduce strain.
+
+---
+
+## 3. Approach and Solution
+
+The posture monitoring workflow is based on computer vision and pose-estimation:
+
+1. The webcam feed is accessed using `getUserMedia()`.
+2. TensorFlow.js pose detection models analyze key body landmarks.
+3. Alignment metrics are calculated:
+   - Forward head displacement
+   - Shoulder rounding
+   - Torso tilt and symmetry
+4. A real-time posture score represents posture quality.
+5. The backend (Node.js + Socket.IO) pushes posture alerts when thresholds are crossed.
+6. A clean UI shows visual overlays, posture metrics, and alerts.
+
+This creates a fast, accurate, privacy-preserving posture correction assistant.
+
+---
+
+## 4. Technologies Used
+
+### Frontend
+
+- HTML, CSS, JavaScript
+- TensorFlow.js
+- Pose Detection (MoveNet / BlazePose)
+- Canvas overlay rendering
+
+### Backend
+
+- Node.js
+- Express.js
+- Socket.IO
+
+### Additional Technologies
+
+- WebRTC (`getUserMedia`)
+- Real-time posture scoring algorithms
+
+---
+
+## 5. Screenshots
+
+Add your screenshots inside a `/screenshots` folder and update the image paths below.
+
+### Dashboard UI
+
+![Dashboard](./screenshots/dashboard.png)
+
+### Real-Time Pose Detection
+
+![Pose Detection](./screenshots/pose-detection.png)
+
+### Posture Alerts
+
+![Alert](./screenshots/alert.png)
+
+---
+
+## 6. Setup and Installation
+
+### Backend Setup
+
+```sh
+cd backend
+npm install
+node server.js    # or nodemon server.js
+```
+
+### Frontend Setup
+
+Open `index.html` using Live Server
+or host it locally:
+
+```sh
+cd frontend
+npx http-server
+```
+
+---
+
+## 7. Features
+
+- Real-time posture tracking
+- Forward head detection
+- Rounded shoulder detection
+- Torso tilt and alignment analysis
+- Posture scoring
+- Skeleton overlay on webcam feed
+- Instant alerts
+- Minimal dark UI
+- Fully on-device inference (privacy-friendly)
+
+---
+
+## 8. Future Enhancements
+
+- Session analytics and posture history
+- Personalized correction tips
+- Break reminders
+- Multi-user mode
+- Improved pose models for higher accuracy
+
+---
+
+## 9. License
+
+MIT License. Free to use, modify, and enhance.
+
+```
